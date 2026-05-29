@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StudieNoter Admin</title>
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+
+<!-- TOAST -->
+<div id="toast-container"></div>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-bg"></div>
+  <div class="login-card">
+    <div class="login-icon">📚</div>
+    <h1>StudieNoter</h1>
+    <p>Admin-panel</p>
+    <div class="login-field">
+      <span class="field-icon">🔑</span>
+      <input type="password" id="login-pass" placeholder="Adgangskode" autocomplete="current-password">
+      <button id="toggle-pass" class="toggle-pass" type="button">👁</button>
+    </div>
+    <button id="login-btn">Log ind</button>
+    <div id="login-error" class="login-error hidden">Forkert adgangskode – prøv igen</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app" class="hidden">
+
+  <!-- HEADER -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <button id="menu-toggle" class="icon-btn" title="Menu">☰</button>
+      <a href="index.html" class="brand">📚 <span>StudieNoter</span> <em>Admin</em></a>
+    </div>
+    <div class="topbar-right">
+      <span id="note-count-badge" class="badge">0 noter</span>
+      <a href="http://localhost:8080/fagnoter/index.html" target="_blank" class="topbar-btn">Siden ↗</a>
+      <button id="btn-logout" class="topbar-btn">Log ud</button>
+    </div>
+  </header>
+
+  <div class="layout">
+
+    <!-- SIDEBAR -->
+    <nav id="sidebar" class="sidebar">
+      <div class="sidebar-section">
+        <button class="nav-btn active" data-tab="add">
+          <span class="nav-icon">✏️</span>
+          <span class="nav-label">Tilføj note</span>
+        </button>
+        <button class="nav-btn" data-tab="notes">
+          <span class="nav-icon">📋</span>
+          <span class="nav-label">Mine noter</span>
+          <span id="sidebar-count" class="nav-count">0</span>
+        </button>
+        <button class="nav-btn" data-tab="stats">
+          <span class="nav-icon">📊</span>
+          <span class="nav-label">Statistik</span>
+        </button>
+        <button class="nav-btn" data-tab="analytics">
+          <span class="nav-icon">👁</span>
+          <span class="nav-label">Besøgslog</span>
+        </button>
+        <button class="nav-btn" data-tab="settings">
+          <span class="nav-icon">⚙️</span>
+          <span class="nav-label">Indstillinger</span>
+        </button>
+      </div>
+
+      <div class="sidebar-subjects">
+        <p class="sidebar-heading">Hurtig-filter</p>
+        <button class="subj-btn active" data-subject="all">Alle fag</button>
+        <button class="subj-btn" data-subject="matematik" style="--c:#2563eb">🔢 Matematik</button>
+        <button class="subj-btn" data-subject="dansk" style="--c:#059669">📖 Dansk</button>
+        <button class="subj-btn" data-subject="engelsk" style="--c:#dc2626">🇬🇧 Engelsk</button>
+        <button class="subj-btn" data-subject="tysk" style="--c:#b45309">🇩🇪 Tysk</button>
+        <button class="subj-btn" data-subject="fysik-kemi" style="--c:#7c3aed">⚛️ Fysik/Kemi</button>
+        <button class="subj-btn" data-subject="biologi" style="--c:#10b981">🌱 Biologi</button>
+        <button class="subj-btn" data-subject="geografi" style="--c:#0891b2">🌍 Geografi</button>
+        <button class="subj-btn" data-subject="historie" style="--c:#ea580c">📜 Historie</button>
+        <button class="subj-btn" data-subject="samfundsfag" style="--c:#e11d48">🏛️ Samfundsfag</button>
+        <button class="subj-btn" data-subject="informatik" style="--c:#475569">💻 Informatik</button>
+      </div>
+    </nav>
+
+    <!-- MAIN -->
+    <main class="main">
+
+      <!-- ── TAB: TILFØJ ── -->
+      <section id="tab-add" class="panel">
+        <div class="panel-header">
+          <div>
+            <h2 id="form-heading">Ny note</h2>
+            <p class="panel-sub">Udfyld felterne og gem – noten vises straks på siden</p>
+          </div>
+          <button id="btn-clear-form" class="ghost-btn">✕ Ryd formular</button>
+        </div>
+
+        <!-- META ROW -->
+        <div class="meta-grid">
+          <div class="field-group">
+            <label>Fag</label>
+            <select id="f-subject" class="field-select">
+              <option value="matematik">🔢 Matematik</option>
+              <option value="dansk">📖 Dansk</option>
+              <option value="engelsk">🇬🇧 Engelsk</option>
+              <option value="tysk">🇩🇪 Tysk</option>
+              <option value="fysik-kemi">⚛️ Fysik/Kemi</option>
+              <option value="biologi">🌱 Biologi</option>
+              <option value="geografi">🌍 Geografi</option>
+              <option value="historie">📜 Historie</option>
+              <option value="samfundsfag">🏛️ Samfundsfag</option>
+              <option value="informatik">💻 Informatik</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label>Niveau</label>
+            <select id="f-level" class="field-select">
+              <option value="0-3">🎒 0–3. klasse</option>
+              <option value="4-6">📓 4–6. klasse</option>
+              <option value="7-9">📖 7–9. klasse</option>
+              <option value="10">🏫 10. klasse</option>
+              <option value="gym">🎓 Gymnasium</option>
+              <option value="uni">🏛️ Videregående</option>
+            </select>
+          </div>
+          <div class="field-group" style="flex:3">
+            <label>Titel</label>
+            <input type="text" id="f-title" class="field-input" placeholder="F.eks. Pythagoras' sætning" maxlength="80">
+          </div>
+          <div class="field-group icon-group">
+            <label>Ikon</label>
+            <input type="text" id="f-icon" class="field-input icon-input" placeholder="📐" maxlength="4">
+            <div class="icon-picker" id="icon-picker">
+              <div class="icon-picker-grid" id="icon-grid"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label>Tags <small>(komma-separeret, f.eks. "geometri, trekant")</small></label>
+          <input type="text" id="f-tags" class="field-input" placeholder="tag1, tag2, tag3">
+        </div>
+
+        <!-- SPLIT EDITOR -->
+        <div class="editor-wrap">
+          <div class="editor-pane">
+            <div class="editor-header">
+              <span>HTML-indhold</span>
+              <div class="toolbar">
+                <button class="tb" title="Definition-boks" data-insert="def">📘 Def</button>
+                <button class="tb" title="Formel-boks" data-insert="formula">🧮 Formel</button>
+                <button class="tb" title="Eksempel-boks" data-insert="example">💡 Eks</button>
+                <div class="tb-sep"></div>
+                <button class="tb" title="Fed tekst" data-insert="bold"><b>B</b></button>
+                <button class="tb" title="Kursiv" data-insert="em"><i>I</i></button>
+                <button class="tb" title="Afsnit" data-insert="p">¶</button>
+                <button class="tb" title="Liste" data-insert="ul">≡</button>
+                <div class="tb-sep"></div>
+                <button class="tb tb-clear" id="tb-clear-body" title="Ryd indhold">✕</button>
+              </div>
+            </div>
+            <textarea id="f-body" class="editor-textarea" placeholder="Brug toolbar-knapperne ovenfor til at indsætte bokse, eller skriv HTML direkte…" spellcheck="false"></textarea>
+            <div class="editor-footer">
+              <span id="char-count">0 tegn</span>
+              <span id="line-count">0 linjer</span>
+            </div>
+          </div>
+
+          <div class="preview-pane">
+            <div class="editor-header">
+              <span>Live forhåndsvisning</span>
+              <div id="preview-subject-badge" class="preview-badge"></div>
+            </div>
+            <div id="preview-content" class="preview-content">
+              <div class="preview-empty">
+                <span>👀</span>
+                <p>Forhåndsvisning vises her når du skriver indhold</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="save-row">
+          <button id="btn-save-note" class="save-btn">
+            <span class="save-btn-icon">💾</span>
+            <span class="save-btn-text">Gem note</span>
+          </button>
+          <div id="save-status" class="save-status hidden"></div>
+        </div>
+      </section>
+
+      <!-- ── TAB: NOTER ── -->
+      <section id="tab-notes" class="panel hidden">
+        <div class="panel-header">
+          <div>
+            <h2>Mine noter</h2>
+            <p class="panel-sub" id="notes-subtitle">Alle dine tilføjede noter</p>
+          </div>
+          <div class="notes-actions">
+            <div class="search-wrap">
+              <span>🔍</span>
+              <input type="search" id="notes-search" class="search-input" placeholder="Søg i noter…">
+            </div>
+            <button id="btn-export" class="ghost-btn">⬇ Eksporter JS</button>
+          </div>
+        </div>
+        <div id="notes-list" class="notes-grid"></div>
+      </section>
+
+      <!-- ── TAB: STATISTIK ── -->
+      <section id="tab-stats" class="panel hidden">
+        <div class="panel-header">
+          <div>
+            <h2>Statistik</h2>
+            <p class="panel-sub">Oversigt over dine noter per fag og niveau</p>
+          </div>
+        </div>
+        <div id="stats-content"></div>
+      </section>
+
+      <!-- ── TAB: BESØGSLOG ── -->
+      <section id="tab-analytics" class="panel hidden">
+        <div class="panel-header">
+          <div>
+            <h2>Besøgslog</h2>
+            <p class="panel-sub">Live data fra alle besøgende på siden</p>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <span id="log-age" class="badge"></span>
+            <button id="btn-refresh-log" class="ghost-btn">↺ Opdater</button>
+            <button id="btn-clear-log" class="ghost-btn" style="color:var(--danger)">🗑 Ryd log</button>
+          </div>
+        </div>
+        <div id="analytics-content">
+          <div class="log-loading">Henter data…</div>
+        </div>
+      </section>
+
+      <!-- ── TAB: INDSTILLINGER ── -->
+      <section id="tab-settings" class="panel hidden">
+        <div class="panel-header">
+          <div>
+            <h2>Indstillinger</h2>
+            <p class="panel-sub">Administrer kode og data</p>
+          </div>
+        </div>
+        <div class="settings-grid">
+          <div class="settings-card">
+            <h3>🔑 Skift adgangskode</h3>
+            <div class="field-group"><label>Nuværende kode</label><input type="password" id="s-old" class="field-input"></div>
+            <div class="field-group"><label>Ny kode</label><input type="password" id="s-new" class="field-input"></div>
+            <div class="field-group"><label>Bekræft ny kode</label><input type="password" id="s-confirm" class="field-input"></div>
+            <button id="btn-change-pass" class="primary-btn">Skift kode</button>
+            <div id="pass-feedback" class="pass-feedback hidden"></div>
+          </div>
+          <div class="settings-card">
+            <h3>🗄 Data</h3>
+            <p class="settings-desc">Dine noter er gemt lokalt i browseren. Eksporter dem som backup.</p>
+            <button id="btn-export2" class="ghost-btn" style="margin-bottom:10px">⬇ Eksporter alle noter</button>
+            <hr style="border-color:var(--border);margin:16px 0">
+            <h4 style="color:var(--danger);margin-bottom:8px">Farezone</h4>
+            <button id="btn-clear-all" class="danger-btn">🗑 Slet alle egne noter</button>
+          </div>
+          <div class="settings-card">
+            <h3>📎 Links</h3>
+            <p class="settings-desc">Hurtig navigation til siden.</p>
+            <a href="http://localhost:8080/fagnoter/index.html" target="_blank" class="link-item">📚 Åbn StudieNoter</a>
+            <a href="http://localhost:8080/fagnoter/index.html" target="_blank" class="link-item">🎓 Matematik-noter</a>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<script src="admin.js"></script>
+</body>
+</html>

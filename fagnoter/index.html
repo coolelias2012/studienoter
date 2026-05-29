@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="StudieNoter – Gratis fagnoter og forklaringer fra 0. klasse til universitet. Dansk, Matematik, Engelsk, Tysk, Fysik/Kemi og meget mere.">
+  <meta name="robots" content="index, follow">
+  <title>StudieNoter – Fagnoter fra 0. klasse til Universitet</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="light">
+
+  <!-- GDPR Cookie Banner -->
+  <div id="cookie-banner" class="cookie-banner" role="dialog" aria-modal="true" aria-labelledby="cookie-title">
+    <div class="cookie-content">
+      <div class="cookie-text">
+        <h3 id="cookie-title">Vi bruger cookies</h3>
+        <p>Vi bruger <strong>nødvendige cookies</strong> for at hjemmesiden fungerer. Vi indsamler <strong>ingen persondata</strong> uden dit eksplicitte samtykke. Analytiske cookies hjælper os med at forbedre indholdet.</p>
+        <a href="privacy.html" target="_blank" rel="noopener">Læs vores privatlivspolitik</a>
+      </div>
+      <div class="cookie-buttons">
+        <button id="btn-accept-all" class="cookie-btn cookie-btn-accept">Accepter alle</button>
+        <button id="btn-accept-necessary" class="cookie-btn cookie-btn-necessary">Kun nødvendige</button>
+        <button id="btn-reject-all" class="cookie-btn cookie-btn-reject">Afvis alle</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header class="header" role="banner">
+    <div class="header-inner">
+      <a href="index.html" class="logo" aria-label="StudieNoter – Forside">
+        <span class="logo-icon" aria-hidden="true">📚</span>
+        <span>Studie<strong>Noter</strong></span>
+      </a>
+      <div class="search-wrap">
+        <label for="search-input" class="sr-only">Søg i fagnoter</label>
+        <input type="search" id="search-input" class="search-input" placeholder="Søg emne, formel, begreb…" autocomplete="off" spellcheck="false">
+        <span class="search-icon" aria-hidden="true">🔍</span>
+        <div id="search-results" class="search-results" role="listbox" aria-label="Søgeresultater"></div>
+      </div>
+      <div class="header-actions">
+        <button id="theme-toggle" class="icon-btn" aria-label="Skift mørkt/lyst tema" title="Skift tema">🌙</button>
+        <button id="print-btn" class="icon-btn" aria-label="Udskriv note" title="Udskriv">🖨️</button>
+        <a href="privacy.html" class="header-link">GDPR</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Level Navigation -->
+  <nav class="level-nav" aria-label="Klassetrin">
+    <div class="level-nav-inner">
+      <button class="level-btn active" data-level="0-3" aria-pressed="true">
+        <span aria-hidden="true">🎒</span> 0–3. klasse
+      </button>
+      <button class="level-btn" data-level="4-6" aria-pressed="false">
+        <span aria-hidden="true">📓</span> 4–6. klasse
+      </button>
+      <button class="level-btn" data-level="7-9" aria-pressed="false">
+        <span aria-hidden="true">📖</span> 7–9. klasse
+      </button>
+      <button class="level-btn" data-level="10" aria-pressed="false">
+        <span aria-hidden="true">🏫</span> 10. klasse
+      </button>
+      <button class="level-btn" data-level="gym" aria-pressed="false">
+        <span aria-hidden="true">🎓</span> Gymnasium
+      </button>
+      <button class="level-btn" data-level="uni" aria-pressed="false">
+        <span aria-hidden="true">🏛️</span> Videregående
+      </button>
+    </div>
+  </nav>
+
+  <!-- Main Layout -->
+  <div class="layout">
+
+    <!-- Subject Sidebar -->
+    <aside class="sidebar" aria-label="Fag">
+      <div class="sidebar-inner">
+        <h2 class="sidebar-heading">Fag</h2>
+        <nav class="subject-nav" aria-label="Vælg fag">
+          <button class="subject-btn active" data-subject="matematik" style="--subject-color:#2563eb" aria-pressed="true">
+            <span class="subject-icon" aria-hidden="true">🔢</span><span>Matematik</span>
+          </button>
+          <button class="subject-btn" data-subject="dansk" style="--subject-color:#059669" aria-pressed="false">
+            <span class="subject-icon" aria-hidden="true">📖</span><span>Dansk</span>
+          </button>
+          <button class="subject-btn" data-subject="engelsk" style="--subject-color:#dc2626" aria-pressed="false">
+            <span class="subject-icon" aria-hidden="true">🇬🇧</span><span>Engelsk</span>
+          </button>
+          <button class="subject-btn" data-subject="tysk" style="--subject-color:#b45309" aria-pressed="false">
+            <span class="subject-icon" aria-hidden="true">🇩🇪</span><span>Tysk</span>
+          </button>
+          <button class="subject-btn" data-subject="fysik-kemi" style="--subject-color:#7c3aed" aria-pressed="false">
+            <span class="subject-icon" aria-hidden="true">⚛️</span><span>Fysik/Kemi</span>
+          </button>
+          <button class="subject-btn" data-subject="biologi" style="--subject-color:#10b981" aria-pressed="false">
+            <span class="subject-icon" aria-hidden="true">🌱</span><span>Biologi</span>
+          </button>
+          <button class="subject-btn" data-subject="geografi" style="--subject-color:#0891b2" aria-pressed="false">
+            <span class="subject-icon" aria-hidden="true">🌍</span><span>Geografi</span>
+          </button>
+          <button class="subject-btn" data-subject="historie" style="--subject-color:#ea580c" aria-pressed="false">
+            <span class="subject-icon" aria-hidden="true">📜</span><span>Historie</span>
+          </button>
+          <button class="subject-btn" data-subject="samfundsfag" style="--subject-color:#e11d48" aria-pressed="false">
+            <span class="subject-icon" aria-hidden="true">🏛️</span><span>Samfundsfag</span>
+          </button>
+          <button class="subject-btn" data-subject="informatik" style="--subject-color:#475569" aria-pressed="false">
+            <span class="subject-icon" aria-hidden="true">💻</span><span>Informatik</span>
+          </button>
+        </nav>
+      </div>
+    </aside>
+
+    <!-- Content Area -->
+    <main class="content-area" id="content-area" aria-live="polite" aria-label="Fagnoter">
+      <!-- Dynamically rendered by app.js -->
+      <div class="loading-state">Indlæser noter…</div>
+    </main>
+
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer" role="contentinfo">
+    <div class="footer-inner">
+      <div class="footer-col">
+        <h4>📚 StudieNoter</h4>
+        <p>Gratis fagnoter fra 0. klasse til universitet. Ingen registrering krævet – bare lær!</p>
+      </div>
+      <div class="footer-col">
+        <h4>Hurtige links</h4>
+        <ul>
+          <li><a href="#" data-nav-subject="matematik">Matematik</a></li>
+          <li><a href="#" data-nav-subject="dansk">Dansk</a></li>
+          <li><a href="#" data-nav-subject="engelsk">Engelsk</a></li>
+          <li><a href="#" data-nav-subject="fysik-kemi">Fysik/Kemi</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Privatliv</h4>
+        <ul>
+          <li><a href="privacy.html">Privatlivspolitik</a></li>
+          <li><a href="privacy.html#gdpr">GDPR</a></li>
+          <li><a href="#" id="cookie-settings-btn">Cookie-indstillinger</a></li>
+          <li><a href="privacy.html#slet-data">Slet mine data</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 StudieNoter &nbsp;|&nbsp; Ingen persondata indsamles uden samtykke &nbsp;|&nbsp;
+        <a href="privacy.html">Privatlivspolitik</a> &nbsp;|&nbsp;
+        <a href="privacy.html#gdpr">GDPR-erklæring</a>
+      </p>
+      <a href="admin.html" style="color:#555;font-size:18px;opacity:0.25;text-decoration:none" aria-hidden="true">⚙</a>
+    </div>
+  </footer>
+
+  <!-- Subject data files (one per subject to avoid connection timeout) -->
+  <script src="data/matematik.js"></script>
+  <script src="data/dansk.js"></script>
+  <script src="data/engelsk.js"></script>
+  <script src="data/tysk.js"></script>
+  <script src="data/fysik.js"></script>
+  <script src="data/biologi.js"></script>
+  <script src="data/geografi.js"></script>
+  <script src="data/historie.js"></script>
+  <script src="data/samfundsfag.js"></script>
+  <script src="data/informatik.js"></script>
+  <!-- Assembles all subjects into CONTENT object -->
+  <script src="content.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
