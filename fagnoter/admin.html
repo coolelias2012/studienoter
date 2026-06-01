@@ -11,36 +11,108 @@
 <!-- TOAST -->
 <div id="toast-container"></div>
 
+<!-- KEYBOARD SHORTCUTS MODAL -->
+<div id="shortcuts-modal" class="modal-overlay hidden" onclick="closeShortcuts(event)">
+  <div class="modal-card shortcuts-card">
+    <div class="modal-header">
+      <h3>⌨️ Tastaturgenveje</h3>
+      <button class="modal-close" onclick="closeShortcutsBtn()">✕</button>
+    </div>
+    <div class="shortcuts-grid">
+      <div class="shortcut-group">
+        <div class="shortcut-group-title">Editor</div>
+        <div class="shortcut-item"><kbd>Ctrl</kbd><kbd>S</kbd><span>Gem note</span></div>
+        <div class="shortcut-item"><kbd>Ctrl</kbd><kbd>B</kbd><span>Fed tekst</span></div>
+        <div class="shortcut-item"><kbd>Ctrl</kbd><kbd>I</kbd><span>Kursiv</span></div>
+        <div class="shortcut-item"><kbd>Ctrl</kbd><kbd>P</kbd><span>Fullscreen preview</span></div>
+        <div class="shortcut-item"><kbd>Esc</kbd><span>Luk fullscreen</span></div>
+      </div>
+      <div class="shortcut-group">
+        <div class="shortcut-group-title">Navigation</div>
+        <div class="shortcut-item"><kbd>Ctrl</kbd><kbd>K</kbd><span>Command palette</span></div>
+        <div class="shortcut-item"><kbd>?</kbd><span>Vis genveje</span></div>
+        <div class="shortcut-item"><kbd>Ctrl</kbd><kbd>1</kbd><span>Dashboard</span></div>
+        <div class="shortcut-item"><kbd>Ctrl</kbd><kbd>2</kbd><span>Tilføj note</span></div>
+        <div class="shortcut-item"><kbd>Ctrl</kbd><kbd>3</kbd><span>Mine noter</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- COMMAND PALETTE -->
+<div id="command-palette" class="modal-overlay hidden" onclick="closePalette(event)">
+  <div class="palette-card">
+    <div class="palette-search-wrap">
+      <span class="palette-icon">⌘</span>
+      <input type="text" id="palette-input" class="palette-input" placeholder="Søg noter, handlinger…" autocomplete="off">
+      <kbd class="palette-esc">Esc</kbd>
+    </div>
+    <div id="palette-results" class="palette-results"></div>
+  </div>
+</div>
+
+<!-- FULLSCREEN PREVIEW -->
+<div id="fullscreen-overlay" class="fullscreen-overlay hidden">
+  <div class="fullscreen-topbar">
+    <span id="fullscreen-title" class="fullscreen-title">Preview</span>
+    <button onclick="closeFullscreen()" class="fullscreen-close">✕ Luk <kbd>Esc</kbd></button>
+  </div>
+  <div id="fullscreen-content" class="fullscreen-content"></div>
+</div>
+
 <!-- LOGIN -->
 <div id="login-screen">
-  <div class="login-bg"></div>
+  <div class="login-bg">
+    <div class="login-particles">
+      <span></span><span></span><span></span><span></span><span></span>
+    </div>
+  </div>
   <div class="login-card">
-    <div class="login-icon">📚</div>
+    <div class="login-logo">
+      <span class="login-book">📚</span>
+      <div class="login-logo-glow"></div>
+    </div>
     <h1>StudieNoter</h1>
-    <p>Admin-panel</p>
+    <p class="login-sub">Admin-panel</p>
     <div class="login-field">
       <span class="field-icon">🔑</span>
       <input type="password" id="login-pass" placeholder="Adgangskode" autocomplete="current-password">
       <button id="toggle-pass" class="toggle-pass" type="button">👁</button>
     </div>
-    <button id="login-btn">Log ind</button>
+    <button id="login-btn" class="login-btn">
+      <span>Log ind</span>
+      <span class="login-btn-arrow">→</span>
+    </button>
     <div id="login-error" class="login-error hidden">Forkert adgangskode – prøv igen</div>
+    <p class="login-hint">Tryk <kbd>?</kbd> for tastaturgenveje efter login</p>
   </div>
 </div>
 
 <!-- APP -->
 <div id="app" class="hidden">
 
-  <!-- HEADER -->
+  <!-- TOPBAR -->
   <header class="topbar">
     <div class="topbar-left">
       <button id="menu-toggle" class="icon-btn" title="Menu">☰</button>
-      <a href="index.html" class="brand">📚 <span>StudieNoter</span> <em>Admin</em></a>
+      <a href="index.html" class="brand">
+        <span class="brand-icon">📚</span>
+        <span>Studie<strong>Noter</strong></span>
+        <em>Admin</em>
+      </a>
+    </div>
+    <div class="topbar-center">
+      <button class="palette-trigger" onclick="openPalette()" title="Ctrl+K">
+        <span>⌘ Søg noter og handlinger…</span>
+        <kbd>Ctrl K</kbd>
+      </button>
     </div>
     <div class="topbar-right">
+      <span id="draft-badge" class="draft-badge hidden">● Kladde gemt</span>
       <span id="note-count-badge" class="badge">0 noter</span>
-      <a href="http://localhost:8080/fagnoter/index.html" target="_blank" class="topbar-btn">Siden ↗</a>
-      <button id="btn-logout" class="topbar-btn">Log ud</button>
+      <a href="index.html" target="_blank" class="topbar-btn">↗ Se side</a>
+      <button class="icon-btn" title="Tastaturgenveje (?)" onclick="openShortcuts()">⌨️</button>
+      <button id="btn-logout" class="topbar-btn danger">Log ud</button>
     </div>
   </header>
 
@@ -49,7 +121,11 @@
     <!-- SIDEBAR -->
     <nav id="sidebar" class="sidebar">
       <div class="sidebar-section">
-        <button class="nav-btn active" data-tab="add">
+        <button class="nav-btn active" data-tab="dashboard">
+          <span class="nav-icon">🏠</span>
+          <span class="nav-label">Dashboard</span>
+        </button>
+        <button class="nav-btn" data-tab="add">
           <span class="nav-icon">✏️</span>
           <span class="nav-label">Tilføj note</span>
         </button>
@@ -86,19 +162,34 @@
         <button class="subj-btn" data-subject="samfundsfag" style="--c:#e11d48">🏛️ Samfundsfag</button>
         <button class="subj-btn" data-subject="informatik" style="--c:#475569">💻 Informatik</button>
       </div>
+
+      <div class="sidebar-footer">
+        <button class="quick-add-btn" onclick="switchTab('add')">
+          <span>+</span> Ny note
+        </button>
+      </div>
     </nav>
 
     <!-- MAIN -->
     <main class="main">
 
+      <!-- ── TAB: DASHBOARD ── -->
+      <section id="tab-dashboard" class="panel">
+        <div id="dashboard-content"></div>
+      </section>
+
       <!-- ── TAB: TILFØJ ── -->
-      <section id="tab-add" class="panel">
+      <section id="tab-add" class="panel hidden">
         <div class="panel-header">
           <div>
             <h2 id="form-heading">Ny note</h2>
-            <p class="panel-sub">Udfyld felterne og gem – noten vises straks på siden</p>
+            <p class="panel-sub">Udfyld felterne og tryk <kbd class="inline-kbd">Ctrl+S</kbd> for at gemme</p>
           </div>
-          <button id="btn-clear-form" class="ghost-btn">✕ Ryd formular</button>
+          <div style="display:flex;gap:8px;align-items:center">
+            <span id="autosave-status" class="autosave-status hidden">💾 Kladde</span>
+            <button id="btn-fullscreen" class="ghost-btn" title="Ctrl+P" onclick="openFullscreen()">⛶ Fullscreen</button>
+            <button id="btn-clear-form" class="ghost-btn">✕ Ryd</button>
+          </div>
         </div>
 
         <!-- META ROW -->
@@ -142,45 +233,68 @@
           </div>
         </div>
 
-        <div class="field-group">
-          <label>Tags <small>(komma-separeret, f.eks. "geometri, trekant")</small></label>
-          <input type="text" id="f-tags" class="field-input" placeholder="tag1, tag2, tag3">
+        <div class="field-group" style="margin-bottom:14px">
+          <label>Tags <small>(komma-separeret)</small></label>
+          <input type="text" id="f-tags" class="field-input" placeholder="tag1, tag2, tag3" id="f-tags" list="tags-suggestions">
+          <datalist id="tags-suggestions"></datalist>
         </div>
 
         <!-- SPLIT EDITOR -->
         <div class="editor-wrap">
           <div class="editor-pane">
             <div class="editor-header">
-              <span>HTML-indhold</span>
+              <span class="editor-title">HTML-indhold</span>
               <div class="toolbar">
-                <button class="tb" title="Definition-boks" data-insert="def">📘 Def</button>
-                <button class="tb" title="Formel-boks" data-insert="formula">🧮 Formel</button>
-                <button class="tb" title="Eksempel-boks" data-insert="example">💡 Eks</button>
+                <div class="tb-group">
+                  <button class="tb tb-block" title="Definition-boks" data-insert="def">📘 Def</button>
+                  <button class="tb tb-block" title="Formel-boks" data-insert="formula">🧮 Formel</button>
+                  <button class="tb tb-block" title="Eksempel-boks" data-insert="example">💡 Eks</button>
+                </div>
                 <div class="tb-sep"></div>
-                <button class="tb" title="Fed tekst" data-insert="bold"><b>B</b></button>
-                <button class="tb" title="Kursiv" data-insert="em"><i>I</i></button>
-                <button class="tb" title="Afsnit" data-insert="p">¶</button>
-                <button class="tb" title="Liste" data-insert="ul">≡</button>
+                <div class="tb-group">
+                  <button class="tb" title="Tip (gul)" data-insert="tip">💡 Tip</button>
+                  <button class="tb" title="Advarsel (rød)" data-insert="warning">⚠️ Fejl</button>
+                  <button class="tb" title="Til eksamen (orange)" data-insert="exam">🎯 Eks</button>
+                  <button class="tb" title="Vidste du (grøn)" data-insert="funfact">🧠 Fun</button>
+                  <button class="tb" title="Husk (blå)" data-insert="note">📌 Husk</button>
+                </div>
                 <div class="tb-sep"></div>
-                <button class="tb tb-clear" id="tb-clear-body" title="Ryd indhold">✕</button>
+                <div class="tb-group">
+                  <button class="tb" title="Trin-for-trin" data-insert="steps">🔢 Trin</button>
+                  <button class="tb" title="Tabel" data-insert="table">▦ Tabel</button>
+                  <button class="tb" title="Afsnit" data-insert="p">¶ P</button>
+                </div>
+                <div class="tb-sep"></div>
+                <div class="tb-group">
+                  <button class="tb" title="Fed (Ctrl+B)" data-insert="bold"><b>B</b></button>
+                  <button class="tb" title="Kursiv (Ctrl+I)" data-insert="em"><i>I</i></button>
+                  <button class="tb" title="Liste" data-insert="ul">≡</button>
+                </div>
+                <div class="tb-sep"></div>
+                <button class="tb tb-clear" id="tb-clear-body" title="Ryd">✕</button>
               </div>
             </div>
-            <textarea id="f-body" class="editor-textarea" placeholder="Brug toolbar-knapperne ovenfor til at indsætte bokse, eller skriv HTML direkte…" spellcheck="false"></textarea>
+            <textarea id="f-body" class="editor-textarea" placeholder="Brug toolbar-knapperne ovenfor til at indsætte bokse, eller skriv HTML direkte…&#10;&#10;Ctrl+S for at gemme" spellcheck="false"></textarea>
             <div class="editor-footer">
               <span id="char-count">0 tegn</span>
+              <span id="word-count">0 ord</span>
               <span id="line-count">0 linjer</span>
+              <span class="editor-hint">Ctrl+B fed · Ctrl+I kursiv · Ctrl+S gem</span>
             </div>
           </div>
 
           <div class="preview-pane">
             <div class="editor-header">
-              <span>Live forhåndsvisning</span>
-              <div id="preview-subject-badge" class="preview-badge"></div>
+              <span class="editor-title">Live forhåndsvisning</span>
+              <div style="display:flex;align-items:center;gap:8px">
+                <div id="preview-subject-badge" class="preview-badge"></div>
+                <button class="tb" title="Fullscreen (Ctrl+P)" onclick="openFullscreen()">⛶</button>
+              </div>
             </div>
             <div id="preview-content" class="preview-content">
               <div class="preview-empty">
                 <span>👀</span>
-                <p>Forhåndsvisning vises her når du skriver indhold</p>
+                <p>Forhåndsvisning vises her<br>når du skriver indhold</p>
               </div>
             </div>
           </div>
@@ -190,6 +304,7 @@
           <button id="btn-save-note" class="save-btn">
             <span class="save-btn-icon">💾</span>
             <span class="save-btn-text">Gem note</span>
+            <kbd class="save-kbd">Ctrl+S</kbd>
           </button>
           <div id="save-status" class="save-status hidden"></div>
         </div>
@@ -205,9 +320,17 @@
           <div class="notes-actions">
             <div class="search-wrap">
               <span>🔍</span>
-              <input type="search" id="notes-search" class="search-input" placeholder="Søg i noter…">
+              <input type="search" id="notes-search" class="search-input" placeholder="Søg noter…">
             </div>
-            <button id="btn-export" class="ghost-btn">⬇ Eksporter JS</button>
+            <select id="notes-sort" class="field-select" style="width:auto;padding:6px 10px;font-size:12px">
+              <option value="newest">Nyeste først</option>
+              <option value="oldest">Ældste først</option>
+              <option value="alpha">A–Z</option>
+              <option value="subject">Fag</option>
+            </select>
+            <button id="btn-export" class="ghost-btn">⬇ Eksporter</button>
+            <button id="btn-import-trigger" class="ghost-btn">⬆ Importer</button>
+            <input type="file" id="import-file" accept=".json" style="display:none">
           </div>
         </div>
         <div id="notes-list" class="notes-grid"></div>
@@ -229,11 +352,12 @@
         <div class="panel-header">
           <div>
             <h2>Besøgslog</h2>
-            <p class="panel-sub">Live data fra alle besøgende på siden</p>
+            <p class="panel-sub">Live data fra alle besøgende</p>
           </div>
           <div style="display:flex;gap:8px;align-items:center">
             <span id="log-age" class="badge"></span>
             <button id="btn-refresh-log" class="ghost-btn">↺ Opdater</button>
+            <button id="btn-export-csv" class="ghost-btn">⬇ CSV</button>
             <button id="btn-clear-log" class="ghost-btn" style="color:var(--danger)">🗑 Ryd log</button>
           </div>
         </div>
@@ -260,18 +384,39 @@
             <div id="pass-feedback" class="pass-feedback hidden"></div>
           </div>
           <div class="settings-card">
-            <h3>🗄 Data</h3>
-            <p class="settings-desc">Dine noter er gemt lokalt i browseren. Eksporter dem som backup.</p>
-            <button id="btn-export2" class="ghost-btn" style="margin-bottom:10px">⬇ Eksporter alle noter</button>
-            <hr style="border-color:var(--border);margin:16px 0">
-            <h4 style="color:var(--danger);margin-bottom:8px">Farezone</h4>
+            <h3>🗄 Data backup</h3>
+            <p class="settings-desc">Eksporter eller importer dine noter. Filformatet er JSON.</p>
+            <div class="settings-btn-row">
+              <button id="btn-export2" class="ghost-btn">⬇ Eksporter JSON</button>
+              <button id="btn-export-js" class="ghost-btn">⬇ Eksporter JS</button>
+            </div>
+            <div class="settings-import-area" id="import-drop-zone">
+              <span class="import-icon">⬆</span>
+              <p>Træk en JSON-fil hertil eller</p>
+              <button class="ghost-btn" onclick="document.getElementById('import-file2').click()">Vælg fil</button>
+              <input type="file" id="import-file2" accept=".json" style="display:none">
+            </div>
+            <hr class="settings-hr">
+            <h4 class="danger-label">Farezone</h4>
             <button id="btn-clear-all" class="danger-btn">🗑 Slet alle egne noter</button>
           </div>
           <div class="settings-card">
-            <h3>📎 Links</h3>
-            <p class="settings-desc">Hurtig navigation til siden.</p>
-            <a href="http://localhost:8080/fagnoter/index.html" target="_blank" class="link-item">📚 Åbn StudieNoter</a>
-            <a href="http://localhost:8080/fagnoter/index.html" target="_blank" class="link-item">🎓 Matematik-noter</a>
+            <h3>⌨️ Tastaturgenveje</h3>
+            <p class="settings-desc">Hurtig reference til alle genveje i admin-panelet.</p>
+            <button class="ghost-btn" onclick="openShortcuts()" style="margin-bottom:8px">Vis alle genveje</button>
+            <div class="shortcut-mini-list">
+              <div class="shortcut-mini"><kbd>Ctrl</kbd><kbd>S</kbd><span>Gem note</span></div>
+              <div class="shortcut-mini"><kbd>Ctrl</kbd><kbd>K</kbd><span>Command palette</span></div>
+              <div class="shortcut-mini"><kbd>Ctrl</kbd><kbd>P</kbd><span>Fullscreen preview</span></div>
+              <div class="shortcut-mini"><kbd>?</kbd><span>Vis genveje</span></div>
+            </div>
+          </div>
+          <div class="settings-card">
+            <h3>📎 Hurtige links</h3>
+            <p class="settings-desc">Navigation til siden og nøglefunktioner.</p>
+            <a href="index.html" target="_blank" class="link-item">📚 Åbn StudieNoter</a>
+            <a href="privacy.html" target="_blank" class="link-item">🔒 Privatlivspolitik</a>
+            <button class="link-item link-item-btn" onclick="switchTab('analytics')">👁 Besøgslog</button>
           </div>
         </div>
       </section>
