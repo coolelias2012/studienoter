@@ -1,0 +1,6 @@
+ticker,navn,antal,koebsdato,koebspris,begrundelse
+AAPL,Apple,5,2024-01-15,185.50,Jeg bruger selv en iPhone og tror mange andre bliver ved med at goere det. Stort maerke der tjener mange penge.
+MSFT,Microsoft,3,2024-02-01,405.00,De laver Windows og Office som skoler og firmaer bruger overalt. De satser stort paa kunstig intelligens.
+NVDA,Nvidia,8,2024-03-10,88.00,Deres grafikkort bruges til computerspil og kunstig intelligens. Alle taler om AI lige nu.
+KO,Coca-Cola,10,2024-01-20,60.25,En kedelig men stabil aktie. Folk drikker sodavand uanset om det er krise eller ej.
+NOVO-B.CO,Novo Nordisk,4,2024-02-15,780.00,Et dansk firma der laver medicin mod diabetes og overvaegt. Meget omtalt og tjener godt.

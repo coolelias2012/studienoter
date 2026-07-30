@@ -1,0 +1,6 @@
+# Bibliotekerne som projektet bruger.
+# Installer dem alle med:  pip install -r requirements.txt
+
+yfinance      # henter aktiekurser gratis fra internettet (ingen API-noegle noedvendig)
+matplotlib    # laver grafer/diagrammer
+rich          # goer tabellen i terminalen paen (frivillig - koden virker ogsaa uden)

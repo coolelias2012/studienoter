@@ -1,0 +1,9 @@
+# Filer som programmet selv laver naar det koerer.
+# De er personlige og skal ikke i Git.
+history.csv
+portefoeljevaerdi.png
+afkast_per_aktie.png
+
+# Python-oprydning
+__pycache__/
+*.pyc
