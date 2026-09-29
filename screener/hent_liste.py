@@ -1,0 +1,56 @@
+"""
+hent_liste.py
+-------------
+Denne fil skaffer listen over de ca. 500 aktier i S&P 500.
+
+Hvor kommer listen fra? Fra Wikipedia! Der findes en tabel med alle
+S&P 500-selskaber, og biblioteket "pandas" kan laese en tabel direkte
+fra en hjemmeside med funktionen read_html().
+
+Hvis internettet er nede (eller Wikipedia driller), falder vi tilbage
+til en kortere indbygget liste, saa programmet stadig kan koere.
+"""
+
+import pandas as pd
+
+
+# Reserveliste: ~40 kendte S&P 500-aktier. Bruges KUN hvis vi ikke kan
+# hente den fulde liste fra internettet. Saa virker programmet altid.
+RESERVE_LISTE = [
+    "AAPL", "MSFT", "NVDA", "AMZN", "GOOGL", "META", "TSLA", "BRK-B",
+    "JPM", "V", "JNJ", "WMT", "PG", "MA", "HD", "CVX", "KO", "PEP",
+    "ABBV", "BAC", "COST", "MRK", "AVGO", "MCD", "ADBE", "CRM", "NFLX",
+    "AMD", "INTC", "DIS", "NKE", "PFE", "TMO", "CSCO", "ORCL", "ACN",
+    "ABT", "XOM", "QCOM", "TXN",
+]
+
+
+def hent_sp500_tickers():
+    """
+    Returnerer en liste af ticker-koder for S&P 500.
+
+    Proever foerst Wikipedia. Lykkes det ikke, bruges reservelisten.
+    """
+    url = "https://en.wikipedia.org/wiki/List_of_S%26P_500_companies"
+
+    try:
+        # read_html finder ALLE tabeller paa siden og giver os en liste.
+        # Den foerste tabel [0] er selskabslisten.
+        tabeller = pd.read_html(url)
+        tabel = tabeller[0]
+
+        # Kolonnen "Symbol" indeholder tickerne.
+        tickers = tabel["Symbol"].tolist()
+
+        # Yahoo Finance skriver punktum-tickers med bindestreg.
+        # Fx bliver "BRK.B" til "BRK-B". Vi retter det her.
+        tickers = [t.replace(".", "-") for t in tickers]
+
+        print(f"  Hentede {len(tickers)} tickers fra Wikipedia.")
+        return tickers
+
+    except Exception as fejl:
+        # Her lander vi hvis der ikke er internet, eller siden er aendret.
+        print(f"  Kunne ikke hente listen fra internettet ({fejl}).")
+        print(f"  Bruger i stedet reservelisten paa {len(RESERVE_LISTE)} aktier.")
+        return RESERVE_LISTE

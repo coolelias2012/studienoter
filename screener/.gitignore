@@ -1,0 +1,7 @@
+# Filer som programmet selv laver naar det koerer:
+screener_resultat.csv
+screener_diagram.png
+
+# Python-oprydning
+__pycache__/
+*.pyc

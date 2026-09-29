@@ -1,0 +1,8 @@
+# Bibliotekerne som screeneren bruger.
+# Installer alle med:  pip install -r requirements.txt
+
+yfinance      # henter aktiekurser gratis (ingen API-noegle noedvendig)
+pandas        # laeser S&P 500-listen og haandterer data
+lxml          # goer at pandas kan laese tabellen fra Wikipedia
+matplotlib    # tegner diagrammet
+rich          # pæne tabeller i terminalen (frivilligt - virker ogsaa uden)
