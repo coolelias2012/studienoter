@@ -1,19 +1,38 @@
 """
 hent_data.py
 ------------
-Denne fil henter kurshistorik for MANGE aktier paa en gang.
+Denne fil henter kurshistorik for MANGE aktier.
 
-Naar man skal hente 500 aktier, maa man IKKE spoerge om dem alle paa
-en gang - saa bliver man blokeret ("rate limited"). Derfor deler vi dem
-op i mindre "hold" (chunks) og henter et hold ad gangen, med en lille
-pause imellem.
+Naar man skal hente ~500 aktier, skal man goere det ROLIGT. Henter man
+for mange paa en gang (parallelt), sker der to ting:
+  - netvaerket og certifikat-tjekket bliver overbelastet (curl-fejl)
+  - yfinance's lille cache-fil bliver der kamp om ("unable to open
+    database file")
 
-yfinance kan hente flere tickers i et enkelt kald med yf.download().
-Det er meget hurtigere end at hente en aktie ad gangen.
+Derfor goer vi det pænt og stille:
+  - faa aktier ad gangen (smaa "hold")
+  - EN ad gangen i stedet for parallelt (threads=False)
+  - en pause mellem hvert hold
+  - og en ekstra runde til sidst for dem der alligevel glippede
+
+Det er lidt langsommere, men til gengaeld virker det. :)
 """
 
+import os
 import time
+
 import yfinance as yf
+
+
+# Vi beder yfinance om at lægge sin cache et sted vi HELT SIKKERT maa
+# skrive (en mappe ved siden af koden). Det fjerner "unable to open
+# database file"-fejlen.
+_CACHE_MAPPE = os.path.join(os.path.dirname(__file__), ".yf_cache")
+os.makedirs(_CACHE_MAPPE, exist_ok=True)
+try:
+    yf.set_tz_cache_location(_CACHE_MAPPE)
+except Exception:
+    pass  # ikke alle yfinance-versioner har denne funktion - saa springer vi den over
 
 
 def _del_op(liste, stoerrelse):
@@ -23,42 +42,55 @@ def _del_op(liste, stoerrelse):
         yield liste[i:i + stoerrelse]
 
 
-def hent_kurshistorik(tickers, periode="1y", hold_stoerrelse=50, pause=1.0):
+def hent_kurshistorik(tickers, periode="1y", hold_stoerrelse=20, pause=1.5):
     """
     Henter dagsluttekurser (Close) for alle tickers over den valgte periode.
 
     Returnerer en dict: { "AAPL": <liste af slutkurser>, ... }
-    Tickers vi ikke kunne hente, springes bare over.
+    Tickers vi ikke kan hente (efter to forsoeg), springes bare over.
     """
     resultat = {}
-    hold = list(_del_op(tickers, hold_stoerrelse))
 
-    print(f"  Henter {len(tickers)} aktier i {len(hold)} hold "
-          f"(a {hold_stoerrelse} ad gangen) ...")
+    # ---- Foerste runde: alle tickers ----
+    print(f"  Henter {len(tickers)} aktier roligt ({hold_stoerrelse} ad gangen) ...")
+    _hent_i_hold(tickers, periode, hold_stoerrelse, pause, resultat)
+
+    # ---- Anden runde: dem vi IKKE fik i foerste omgang ----
+    mangler = [t for t in tickers if t not in resultat]
+    if mangler:
+        print(f"  {len(mangler)} kom ikke med. Holder en lille pause og "
+              f"proever dem igen ...")
+        time.sleep(3)
+        # Endnu mindre hold og laengere pause i anden runde.
+        _hent_i_hold(mangler, periode, max(8, hold_stoerrelse // 2),
+                     pause + 1.0, resultat)
+
+    print(f"  Faerdig med at hente: {len(resultat)} af {len(tickers)} aktier.")
+    return resultat
+
+
+def _hent_i_hold(tickers, periode, hold_stoerrelse, pause, resultat):
+    """Henter en liste af tickers hold for hold og lægger dem i 'resultat'."""
+    hold = list(_del_op(tickers, hold_stoerrelse))
 
     for nummer, gruppe in enumerate(hold, start=1):
         print(f"    Hold {nummer}/{len(hold)} ...", end=" ", flush=True)
 
-        # Vi forsoeger op til 3 gange, hvis det fejler (fx daarligt net).
         data = _hent_et_hold(gruppe, periode)
 
-        if data is None:
-            print("sprunget over (fejl).")
-            continue
+        fik = 0
+        if data is not None:
+            for ticker in gruppe:
+                serie = _traek_close_ud(data, ticker, len(gruppe))
+                if serie is not None and len(serie) > 0:
+                    resultat[ticker] = serie
+                    fik += 1
 
-        # Traek Close-kurserne ud for hver ticker i holdet.
-        for ticker in gruppe:
-            serie = _traek_close_ud(data, ticker, len(gruppe))
-            if serie is not None and len(serie) > 0:
-                resultat[ticker] = serie
+        print(f"fik {fik}/{len(gruppe)} (i alt {len(resultat)}).")
 
-        print(f"ok ({len(resultat)} i alt).")
-
-        # Lille pause saa vi ikke bliver blokeret. Ikke efter sidste hold.
+        # Pause mellem hold, saa vi ikke overbelaster noget. Ikke efter sidste.
         if nummer < len(hold):
             time.sleep(pause)
-
-    return resultat
 
 
 def _hent_et_hold(gruppe, periode, forsoeg=3):
@@ -71,7 +103,7 @@ def _hent_et_hold(gruppe, periode, forsoeg=3):
                 interval="1d",
                 group_by="ticker",   # saa vi kan slaa op pr. ticker bagefter
                 auto_adjust=True,    # justerer for udbytte/aktiesplit
-                threads=True,        # hent flere paa en gang (hurtigere)
+                threads=False,       # EN ad gangen - meget mere stabilt
                 progress=False,      # ingen fremdriftsbjaelke i terminalen
             )
             if data is not None and not data.empty:
@@ -79,7 +111,7 @@ def _hent_et_hold(gruppe, periode, forsoeg=3):
         except Exception:
             pass  # vi proever igen efter en voksende pause
 
-        # Vent laengere og laengere: 2s, saa 4s, saa 8s ("backoff").
+        # Vent laengere og laengere: 2s, saa 4s, saa 6s ("backoff").
         time.sleep(2 * (n + 1))
 
     return None
