@@ -4,5 +4,6 @@
 yfinance      # henter aktiekurser gratis (ingen API-noegle noedvendig)
 pandas        # laeser S&P 500-listen og haandterer data
 lxml          # goer at pandas kan laese tabellen fra Wikipedia
+requests      # henter Wikipedia-siden (virker ogsaa paa Mac uden cert-fejl)
 matplotlib    # tegner diagrammet
 rich          # pæne tabeller i terminalen (frivilligt - virker ogsaa uden)

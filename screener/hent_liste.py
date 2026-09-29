@@ -4,14 +4,23 @@ hent_liste.py
 Denne fil skaffer listen over de ca. 500 aktier i S&P 500.
 
 Hvor kommer listen fra? Fra Wikipedia! Der findes en tabel med alle
-S&P 500-selskaber, og biblioteket "pandas" kan laese en tabel direkte
-fra en hjemmeside med funktionen read_html().
+S&P 500-selskaber, og biblioteket "pandas" kan lave en tabel om fra HTML
+med funktionen read_html().
+
+Vi henter selve siden med "requests" i stedet for at lade pandas hente
+den. Hvorfor? Fordi requests medbringer sine egne "certifikater" (via
+pakken certifi), saa det virker ogsaa paa en Mac. Ellers faar man tit
+fejlen "SSL: CERTIFICATE_VERIFY_FAILED".
 
 Hvis internettet er nede (eller Wikipedia driller), falder vi tilbage
 til en kortere indbygget liste, saa programmet stadig kan koere.
 """
 
+import io
+
 import pandas as pd
+import requests
+
 
 
 # Reserveliste: ~40 kendte S&P 500-aktier. Bruges KUN hvis vi ikke kan
@@ -34,9 +43,19 @@ def hent_sp500_tickers():
     url = "https://en.wikipedia.org/wiki/List_of_S%26P_500_companies"
 
     try:
-        # read_html finder ALLE tabeller paa siden og giver os en liste.
+        # Hent selve HTML-siden med requests. En "User-Agent" faar
+        # Wikipedia til at behandle os som en almindelig browser.
+        svar = requests.get(
+            url,
+            headers={"User-Agent": "Mozilla/5.0 (aktie-screener)"},
+            timeout=15,
+        )
+        svar.raise_for_status()  # kaster en fejl hvis siden ikke kom ok
+
+        # read_html finder ALLE tabeller i HTML'en og giver os en liste.
+        # io.StringIO pakker teksten, som nyere pandas gerne vil have det.
         # Den foerste tabel [0] er selskabslisten.
-        tabeller = pd.read_html(url)
+        tabeller = pd.read_html(io.StringIO(svar.text))
         tabel = tabeller[0]
 
         # Kolonnen "Symbol" indeholder tickerne.
